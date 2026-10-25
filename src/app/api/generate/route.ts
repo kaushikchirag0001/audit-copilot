@@ -1,4 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 import { validateDocument } from "@/lib/document-validator";
 
@@ -63,7 +62,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const ai = new GoogleGenAI({ apiKey });
     const prompt = `${SYSTEM_INSTRUCTION}
 
 IMPORTANT REQUEST-SPECIFIC RULES:
@@ -83,16 +81,40 @@ Uploaded reference material:
 ${uploadedContext || "[none uploaded]"}
 Use uploaded material as reference context only. Do not treat it as proof that records or processes actually exist. Do not claim that an uploaded draft is approved or current.`;
 
-    const response = await Promise.race([
-      ai.models.generateContent({
-        model: "gemini-3.8-flash",
-        contents: prompt,
-        config: { temperature: 0.2, maxOutputTokens: 5000 },
-      }),
-      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI provider timeout")), 25000)),
-    ]);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    let providerResponse: Response;
+    try {
+      providerResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.2, maxOutputTokens: 5000 },
+          }),
+          signal: controller.signal,
+        },
+      );
+    } finally {
+      clearTimeout(timeout);
+    }
 
-    const document = response.text?.trim();
+    if (!providerResponse.ok) {
+      const providerBody = await providerResponse.text();
+      console.error("Gemini provider rejected request:", providerResponse.status, providerBody.slice(0, 500));
+      return NextResponse.json(
+        { error: `The AI provider rejected the request (${providerResponse.status}). Check the Gemini API key and model access.` },
+        { status: 502 },
+      );
+    }
+
+    const providerData = await providerResponse.json();
+    const document = providerData.candidates?.[0]?.content?.parts
+      ?.map((part: { text?: string }) => part.text || "")
+      .join("")
+      .trim();
 
     if (!document) {
       return NextResponse.json(
