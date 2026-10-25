@@ -2,6 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 import { validateDocument } from "@/lib/document-validator";
 
+export const maxDuration = 60;
 
 const SYSTEM_INSTRUCTION = `You are Audit Copilot, an assistant for manufacturing quality and audit documentation.
 Create a practical, editable first draft. Never invent company-specific evidence, results, approvals, names, dates, IDs, or signatures. Use clear [PLACEHOLDER] markers for missing facts. Do not reproduce copyrighted standard text. If a standard is mentioned, refer to relevant clauses only when reasonably confident.
@@ -21,7 +22,7 @@ Use plain professional language suitable for a small or medium-sized manufacturi
 
 export async function POST(request: Request) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "");
 
     if (!apiKey || apiKey === "your_gemini_api_key") {
       return NextResponse.json(
@@ -65,6 +66,12 @@ export async function POST(request: Request) {
     const ai = new GoogleGenAI({ apiKey });
     const prompt = `${SYSTEM_INSTRUCTION}
 
+IMPORTANT REQUEST-SPECIFIC RULES:
+- The current user request below is authoritative and must control the document subject, process, industry, and examples.
+- Do not reuse the CNC calibration example or any previous request unless the current user explicitly asks for it.
+- Before drafting, silently identify the requested document type and write only for that request.
+- If the request is about suppliers, write a supplier document; if it is about training, write a training document; if it is about maintenance, write a maintenance document, and so on.
+
 User role: ${role}
 Output language: ${language}
 Applicable standard: ${standard}
@@ -76,14 +83,14 @@ Uploaded reference material:
 ${uploadedContext || "[none uploaded]"}
 Use uploaded material as reference context only. Do not treat it as proof that records or processes actually exist. Do not claim that an uploaded draft is approved or current.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
-      contents: prompt,
-      config: {
-        temperature: 0.25,
-        maxOutputTokens: 5000,
-      },
-    });
+    const response = await Promise.race([
+      ai.models.generateContent({
+        model: "gemini-3.8-flash",
+        contents: prompt,
+        config: { temperature: 0.2, maxOutputTokens: 5000 },
+      }),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI provider timeout")), 25000)),
+    ]);
 
     const document = response.text?.trim();
 
@@ -96,7 +103,7 @@ Use uploaded material as reference context only. Do not treat it as proof that r
 
     return NextResponse.json({ document, quality: validateDocument(document) });
   } catch (error) {
-    console.error("Gemini generation error:", error);
+    console.error("Gemini generation error:", error instanceof Error ? error.message : "unknown error");
     return NextResponse.json(
       {
         error:
