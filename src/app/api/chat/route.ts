@@ -50,12 +50,12 @@ ${review || "[no review completed]"}
 USER QUESTION:
 ${message}`;
 
-    if (process.env.DEEPSEEK_API_KEY) {
+    if (process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")) {
       const response = await fetch("https://api.deepseek.com/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+          Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")}`,
         },
         body: JSON.stringify({
           model: "deepseek-flash",

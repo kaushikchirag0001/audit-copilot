@@ -67,12 +67,12 @@ ${document}`;
 
     let raw = "";
 
-    if (provider === "deepseek" && process.env.DEEPSEEK_API_KEY) {
+    if (provider === "deepseek" && process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")) {
       const response = await fetch("https://api.deepseek.com/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+          Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")}`,
         },
         body: JSON.stringify({
           model: "deepseek-chat",
@@ -117,7 +117,7 @@ ${document}`;
     const review = JSON.parse(cleanJson(raw));
 
     return NextResponse.json({
-      provider: provider === "deepseek" && process.env.DEEPSEEK_API_KEY ? "deepseek" : "gemini",
+      provider: provider === "deepseek" && process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "") ? "deepseek" : "gemini",
       review,
     });
   } catch (error) {
