@@ -1,0 +1,8 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
+export default function InfoPage({ eyebrow, title, intro, sections }: { eyebrow: string; title: string; intro: string; sections: { heading: string; body: string }[] }) {
+  const router = useRouter();
+  return <main className="min-h-screen bg-[#f1f3f6] px-5 py-8 text-[#2b1635] sm:px-8 sm:py-12"><section className="mx-auto max-w-4xl"><header className="mb-12 flex items-center justify-between"><button onClick={() => router.push("/")} className="flex items-center gap-3 text-left"><span className="rounded-full border border-[#d1d4de] bg-white px-3 py-2 text-lg font-bold">←</span><span><span className="block text-[17px] font-bold">Audit Copilot</span><span className="block text-[11px] uppercase tracking-[0.15em] text-[#817687]">Manufacturing audit preparation</span></span></button><button onClick={() => router.push("/auth")} className="rounded-xl bg-[#392047] px-4 py-2.5 text-sm font-bold text-white">Create account</button></header><p className="text-xs font-bold uppercase tracking-[0.15em] text-[#817687]">{eyebrow}</p><h1 className="mt-3 text-4xl font-bold tracking-[-0.04em] sm:text-5xl">{title}</h1><p className="mt-5 max-w-3xl text-base leading-7 text-[#6e6876]">{intro}</p><div className="mt-10 space-y-5">{sections.map((section) => <section key={section.heading} className="rounded-3xl border border-[#d8dbe3] bg-white p-6 shadow-sm sm:p-8"><h2 className="text-xl font-bold">{section.heading}</h2><p className="mt-3 whitespace-pre-line text-sm leading-7 text-[#6e6876]">{section.body}</p></section>)}</div></section></main>;
+}

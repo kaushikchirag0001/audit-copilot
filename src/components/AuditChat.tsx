@@ -101,7 +101,7 @@ export default function AuditChat({
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-[#1f6255] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_30px_rgba(31,98,85,0.28)] transition hover:bg-[#174d43] hover:shadow-[0_12px_35px_rgba(31,98,85,0.38)]"
+          className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-[#392047] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_30px_rgba(31,98,85,0.28)] transition hover:bg-[#281430] hover:shadow-[0_12px_35px_rgba(31,98,85,0.38)]"
           aria-label="Open Audit AI chat"
         >
           <MessageCircle size={18} />
@@ -114,21 +114,21 @@ export default function AuditChat({
         <>
           <button
             onClick={() => setIsOpen(false)}
-            className="fixed inset-0 z-40 bg-[#173b35]/20"
+            className="fixed inset-0 z-40 bg-[#2b1635]/20"
             aria-label="Close Audit AI chat"
           />
 
-          <section className="fixed bottom-0 right-0 z-50 flex h-[min(720px,100vh)] w-full flex-col border-l border-[#dce7df] bg-white shadow-[-12px_0_40px_rgba(34,72,59,0.16)] sm:bottom-5 sm:right-5 sm:h-[min(680px,calc(100vh-40px))] sm:w-[430px] sm:rounded-3xl sm:border">
-            <header className="flex items-center justify-between border-b border-[#e8efe9] px-5 py-4">
+          <section className="fixed bottom-0 right-0 z-50 flex h-[min(720px,100vh)] w-full flex-col border-l border-[#d8dbe3] bg-white shadow-[-12px_0_40px_rgba(34,72,59,0.16)] sm:bottom-5 sm:right-5 sm:h-[min(680px,calc(100vh-40px))] sm:w-[430px] sm:rounded-3xl sm:border">
+            <header className="flex items-center justify-between border-b border-[#efedf3] px-5 py-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#e5f1e9] text-[#1f6255]">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f6ebc5] text-[#392047]">
                   <Sparkles size={18} />
                 </div>
                 <div>
-                  <h2 className="text-sm font-bold text-[#244c41]">
+                  <h2 className="text-sm font-bold text-[#3a2446]">
                     Chat with Audit AI
                   </h2>
-                  <p className="text-[11px] text-[#81958b]">
+                  <p className="text-[11px] text-[#928a99]">
                     Explanations, evidence, and next steps
                   </p>
                 </div>
@@ -137,7 +137,7 @@ export default function AuditChat({
               <div className="flex items-center gap-1">
                 <button
                   onClick={clearChat}
-                  className="rounded-lg p-2 text-[#81958b] hover:bg-[#f1f7f2] hover:text-[#1f6255]"
+                  className="rounded-lg p-2 text-[#928a99] hover:bg-[#f3f1f6] hover:text-[#392047]"
                   title="Clear chat"
                   aria-label="Clear chat"
                 >
@@ -145,7 +145,7 @@ export default function AuditChat({
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="rounded-lg p-2 text-[#81958b] hover:bg-[#f1f7f2] hover:text-[#1f6255]"
+                  className="rounded-lg p-2 text-[#928a99] hover:bg-[#f3f1f6] hover:text-[#392047]"
                   title="Close chat"
                   aria-label="Close chat"
                 >
@@ -155,7 +155,7 @@ export default function AuditChat({
             </header>
 
             {!document && (
-              <div className="mx-5 mt-4 rounded-xl bg-[#f7faf7] p-3 text-xs leading-5 text-[#71877c]">
+              <div className="mx-5 mt-4 rounded-xl bg-[#f6f7fa] p-3 text-xs leading-5 text-[#6e6876]">
                 Create a document first for document-specific answers. You can still ask general audit questions.
               </div>
             )}
@@ -173,8 +173,8 @@ export default function AuditChat({
                   <div
                     className={`max-w-[88%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-6 ${
                       chatMessage.role === "user"
-                        ? "bg-[#1f6255] text-white"
-                        : "border border-[#dfe7df] bg-[#f7faf7] text-[#405d53]"
+                        ? "bg-[#392047] text-white"
+                        : "border border-[#d8dbe3] bg-[#f6f7fa] text-[#4b3656]"
                     }`}
                   >
                     {chatMessage.content}
@@ -183,20 +183,20 @@ export default function AuditChat({
               ))}
 
               {busy && (
-                <div className="text-sm text-[#81958b]">
+                <div className="text-sm text-[#928a99]">
                   Audit AI is thinking...
                 </div>
               )}
             </div>
 
-            <div className="border-t border-[#e8efe9] p-4">
+            <div className="border-t border-[#efedf3] p-4">
               <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
                 {suggestions.map((suggestion) => (
                   <button
                     key={suggestion}
                     type="button"
                     onClick={() => setMessage(suggestion)}
-                    className="shrink-0 rounded-full border border-[#d6e2d8] bg-[#fbfdfb] px-3 py-2 text-[11px] font-semibold text-[#477366] hover:border-[#71a58f]"
+                    className="shrink-0 rounded-full border border-[#d9dbe4] bg-[#fcfcfd] px-3 py-2 text-[11px] font-semibold text-[#66506f] hover:border-[#c18a18]"
                   >
                     {suggestion}
                   </button>
@@ -214,12 +214,12 @@ export default function AuditChat({
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}
                   placeholder="Ask about your audit..."
-                  className="min-w-0 flex-1 rounded-xl border border-[#d6e2d8] px-3 py-3 text-sm"
+                  className="min-w-0 flex-1 rounded-xl border border-[#d9dbe4] px-3 py-3 text-sm"
                 />
                 <button
                   type="submit"
                   disabled={busy || !message.trim()}
-                  className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#1f6255] text-white hover:bg-[#174d43] disabled:opacity-50"
+                  className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#392047] text-white hover:bg-[#281430] disabled:opacity-50"
                   aria-label="Send message"
                 >
                   <Send size={17} />

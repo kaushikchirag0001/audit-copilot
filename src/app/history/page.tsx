@@ -60,7 +60,7 @@ export default function HistoryPage() {
     }
 
     loadDocuments();
-  }, [router, supabase]);
+  }, [router]);
 
   async function deleteDocument(id: string) {
     const confirmed = window.confirm(
@@ -99,13 +99,13 @@ export default function HistoryPage() {
   }, [documents, search]);
 
   return (
-    <main className="min-h-screen bg-[#f7f8f5] text-[#173b35]">
-      <header className="border-b border-[#dfe7df] bg-[#fbfcfa]">
+    <main className="min-h-screen bg-[#f1f3f6] text-[#2b1635]">
+      <header className="border-b border-[#d8dbe3] bg-[#f8f9fb]">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 sm:px-8">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/")}
-              className="rounded-full border border-[#cfddd3] bg-white px-3 py-2 text-lg font-bold text-[#315e53] hover:border-[#1f6255]"
+              className="rounded-full border border-[#d1d4de] bg-white px-3 py-2 text-lg font-bold text-[#4b3656] hover:border-[#392047]"
               aria-label="Back to workspace"
             >
               ←
@@ -114,12 +114,12 @@ export default function HistoryPage() {
               onClick={() => router.push("/")}
               className="flex items-center gap-3"
             >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1f6255] text-lg font-bold text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#392047] text-lg font-bold text-white">
               A
             </div>
             <div className="text-left">
               <div className="text-[17px] font-bold tracking-tight">Audit Copilot</div>
-              <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#769087]">
+              <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#817687]">
                 Document history
               </div>
             </div>
@@ -128,7 +128,7 @@ export default function HistoryPage() {
 
           <button
             onClick={() => router.push("/")}
-            className="rounded-full border border-[#cfddd3] bg-white px-4 py-2 text-sm font-semibold text-[#315e53]"
+            className="rounded-full border border-[#d1d4de] bg-white px-4 py-2 text-sm font-semibold text-[#4b3656]"
           >
             New document
           </button>
@@ -137,13 +137,13 @@ export default function HistoryPage() {
 
       <section className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-12">
         <div className="mb-7">
-          <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#87a096]">
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#817687]">
             Your workspace
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-[-0.03em] sm:text-4xl">
             Saved documents
           </h1>
-          <p className="mt-2 text-[#6c7e76]">
+          <p className="mt-2 text-[#756d7d]">
             Search and download drafts created in your account.
           </p>
         </div>
@@ -153,15 +153,15 @@ export default function HistoryPage() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search by title, request, standard, or document text..."
-            className="min-w-0 flex-1 rounded-2xl border border-[#d6e2d8] bg-white px-4 py-3 text-sm outline-none focus:border-[#3b8a73] focus:ring-4 focus:ring-[#dff0e5]"
+            className="min-w-0 flex-1 rounded-2xl border border-[#d9dbe4] bg-white px-4 py-3 text-sm outline-none focus:border-[#b77b0f] focus:ring-4 focus:ring-[#f5e8bd]"
           />
-          <div className="rounded-2xl bg-[#e5f1e9] px-4 py-3 text-center text-sm font-bold text-[#2d6c5b]">
+          <div className="rounded-2xl bg-[#f6ebc5] px-4 py-3 text-center text-sm font-bold text-[#76500a]">
             {filteredDocuments.length} document{filteredDocuments.length === 1 ? "" : "s"}
           </div>
         </div>
 
         {loading && (
-          <div className="rounded-3xl border border-[#dfe7df] bg-white p-8 text-center text-sm text-[#71877c]">
+          <div className="rounded-3xl border border-[#d8dbe3] bg-white p-8 text-center text-sm text-[#6e6876]">
             Loading your documents...
           </div>
         )}
@@ -173,12 +173,12 @@ export default function HistoryPage() {
         )}
 
         {!loading && !error && filteredDocuments.length === 0 && (
-          <div className="rounded-3xl border border-[#dfe7df] bg-white p-10 text-center">
-            <div className="text-3xl text-[#5a917e]">▤</div>
+          <div className="rounded-3xl border border-[#d8dbe3] bg-white p-10 text-center">
+            <div className="text-3xl text-[#a87514]">▤</div>
             <h2 className="mt-3 text-lg font-bold">
               {documents.length ? "No matching documents" : "No saved documents yet"}
             </h2>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#81958b]">
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#928a99]">
               {documents.length
                 ? "Try a different search term."
                 : "Create your first audit document and it will appear here."}
@@ -190,21 +190,21 @@ export default function HistoryPage() {
           {filteredDocuments.map((document) => (
             <article
               key={document.id}
-              className="rounded-3xl border border-[#dfe7df] bg-white p-5 shadow-[0_8px_25px_rgba(34,72,59,0.04)] sm:p-6"
+              className="rounded-3xl border border-[#d8dbe3] bg-white p-5 shadow-[0_8px_25px_rgba(34,72,59,0.04)] sm:p-6"
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
-                  <h2 className="truncate text-lg font-bold text-[#244c41]">
+                  <h2 className="truncate text-lg font-bold text-[#3a2446]">
                     {document.title}
                   </h2>
-                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#71877c]">
+                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#6e6876]">
                     {document.request}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                    <span className="rounded-full bg-[#eef7ef] px-3 py-1 font-semibold text-[#39745e]">
+                    <span className="rounded-full bg-[#f2eef6] px-3 py-1 font-semibold text-[#966712]">
                       {document.standard || "Standard not specified"}
                     </span>
-                    <span className="rounded-full bg-[#f1f5f1] px-3 py-1 text-[#71877c]">
+                    <span className="rounded-full bg-[#f1f5f1] px-3 py-1 text-[#6e6876]">
                       {new Date(document.created_at).toLocaleString()}
                     </span>
                   </div>
@@ -212,8 +212,14 @@ export default function HistoryPage() {
 
                 <div className="flex shrink-0 gap-2">
                   <button
+                    onClick={() => router.push(`/documents/${document.id}`)}
+                    className="rounded-xl border border-[#d1b56c] bg-white px-4 py-2.5 text-sm font-bold text-[#4b3656] hover:bg-[#faf3dc]"
+                  >
+                    Edit
+                  </button>
+                  <button
                     onClick={() => downloadText(document)}
-                    className="rounded-xl bg-[#1f6255] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#174d43]"
+                    className="rounded-xl bg-[#392047] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#281430]"
                   >
                     Download TXT
                   </button>
@@ -228,11 +234,11 @@ export default function HistoryPage() {
                 </div>
               </div>
 
-              <details className="mt-5 border-t border-[#edf1ed] pt-4">
-                <summary className="cursor-pointer text-sm font-bold text-[#477366]">
+              <details className="mt-5 border-t border-[#eceaf0] pt-4">
+                <summary className="cursor-pointer text-sm font-bold text-[#66506f]">
                   Preview document
                 </summary>
-                <pre className="mt-4 max-h-96 overflow-auto whitespace-pre-wrap rounded-2xl bg-[#fbfdfb] p-4 font-serif text-xs leading-6 text-[#304941]">
+                <pre className="mt-4 max-h-96 overflow-auto whitespace-pre-wrap rounded-2xl bg-[#fcfcfd] p-4 font-serif text-xs leading-6 text-[#304941]">
                   {document.content}
                 </pre>
               </details>
