@@ -183,8 +183,13 @@ export default function AuditChat({
               ))}
 
               {busy && (
-                <div className="text-sm text-[#928a99]">
-                  Audit AI is thinking...
+                <div className="flex items-center gap-3 text-sm text-[#928a99]">
+                  <div className="flex items-center gap-1 rounded-2xl border border-[#d8dbe3] bg-[#f6f7fa] px-4 py-3">
+                    <span className="audit-pulse h-2 w-2 rounded-full bg-[#c18a18]" />
+                    <span className="audit-pulse h-2 w-2 rounded-full bg-[#c18a18] [animation-delay:160ms]" />
+                    <span className="audit-pulse h-2 w-2 rounded-full bg-[#c18a18] [animation-delay:320ms]" />
+                  </div>
+                  <span>Audit AI is thinking</span>
                 </div>
               )}
             </div>
