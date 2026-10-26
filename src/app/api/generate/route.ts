@@ -83,7 +83,7 @@ Use uploaded material as reference context only. Do not treat it as proof that r
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
-    let providerResponse: Response;
+    let providerResponse: Response | null = null;
     try {
       providerResponse = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -97,17 +97,33 @@ Use uploaded material as reference context only. Do not treat it as proof that r
           signal: controller.signal,
         },
       );
+    } catch (providerError) {
+      console.error("Gemini request failed:", providerError instanceof Error ? providerError.message : "unknown error");
     } finally {
       clearTimeout(timeout);
     }
 
-    if (!providerResponse.ok) {
-      const providerBody = await providerResponse.text();
-      console.error("Gemini provider rejected request:", providerResponse.status, providerBody.slice(0, 500));
-      return NextResponse.json(
-        { error: `The AI provider rejected the request (${providerResponse.status}). Check the Gemini API key and model access.` },
-        { status: 502 },
-      );
+    if (!providerResponse || !providerResponse.ok) {
+      const providerBody = providerResponse ? await providerResponse.text() : "Gemini request timed out";
+      console.error("Gemini provider rejected request:", providerResponse?.status || "timeout", providerBody.slice(0, 500));
+      const deepseekKey = process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "");
+      if (deepseekKey) {
+        try {
+          const fallback = await fetch("https://api.deepseek.com/chat/completions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${deepseekKey}` },
+            body: JSON.stringify({ model: "deepseek-chat", temperature: 0.2, messages: [{ role: "system", content: "Return only the requested audit document. Follow the user's current subject exactly. Never reuse a CNC example unless requested." }, { role: "user", content: prompt }] }),
+          });
+          if (fallback.ok) {
+            const fallbackData = await fallback.json();
+            const fallbackDocument = fallbackData.choices?.[0]?.message?.content?.trim();
+            if (fallbackDocument) return NextResponse.json({ document: fallbackDocument, quality: validateDocument(fallbackDocument), provider: "fallback" });
+          }
+        } catch (fallbackError) {
+          console.error("Fallback generation failed:", fallbackError instanceof Error ? fallbackError.message : "unknown error");
+        }
+      }
+      return NextResponse.json({ error: "The document provider is temporarily unavailable. Please try again in a moment." }, { status: 503 });
     }
 
     const providerData = await providerResponse.json();
