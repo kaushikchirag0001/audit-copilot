@@ -57,4 +57,21 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent) !importa
 .audit-shimmer::after { content: ""; position: absolute; inset: 0; width: 42%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent); animation: audit-shimmer 1.8s ease-in-out infinite; }
 .audit-breathe { animation: audit-breathe 2.2s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; } }
+@keyframes audit-grid-drift { from { background-position: 0 0, 0 0; } to { background-position: 56px 56px, -56px -56px; } }
+@keyframes audit-float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-8px) rotate(1deg); } }
+@keyframes audit-progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
+@keyframes audit-scan { 0% { transform: translateY(-120%); opacity: 0; } 20%, 70% { opacity: .45; } 100% { transform: translateY(520%); opacity: 0; } }
+.audit-shell { position: relative; isolation: isolate; }
+.audit-shell::before { content: ""; position: fixed; inset: 80px 0 0; z-index: -2; pointer-events: none; opacity: .32; background-image: linear-gradient(rgba(57,32,71,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(57,32,71,.045) 1px, transparent 1px); background-size: 28px 28px; animation: audit-grid-drift 16s linear infinite; mask-image: linear-gradient(to bottom, black, transparent 82%); }
+.audit-shell::after { content: ""; position: fixed; top: 15%; right: -10rem; z-index: -1; width: 25rem; height: 25rem; pointer-events: none; border-radius: 999px; background: radial-gradient(circle, rgba(193,138,24,.17), transparent 68%); filter: blur(8px); animation: audit-float 8s ease-in-out infinite; }
+.audit-header { animation: audit-header-in .7s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes audit-header-in { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+.audit-primary { position: relative; overflow: hidden; transition: transform 220ms ease, box-shadow 220ms ease, background-color 220ms ease; }
+.audit-primary::before { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 28%; transform: skewX(-18deg); background: rgba(255,255,255,.18); transition: left 600ms ease; }
+.audit-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 32px rgba(57,32,71,.24); }
+.audit-primary:hover::before { left: 120%; }
+.audit-float { animation: audit-float 4s ease-in-out infinite; }
+.audit-progress-rail { position: relative; overflow: hidden; height: 5px; border-radius: 999px; background: #eef0f4; }
+.audit-progress-rail::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 34%; border-radius: inherit; background: linear-gradient(90deg, #966712, #f2d981, #c18a18); animation: audit-progress 1.9s ease-in-out infinite; }
+.audit-scanline { position: absolute; inset: 0 0 auto; height: 22%; pointer-events: none; background: linear-gradient(to bottom, transparent, rgba(193,138,24,.12), transparent); animation: audit-scan 3s ease-in-out infinite; }
 
