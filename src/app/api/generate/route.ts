@@ -19,6 +19,98 @@ Every draft must contain:
 Clearly distinguish requirements, company-defined methods, assumptions, placeholders, and evidence still to be created. Never mark an item complete automatically. Never invent company-specific evidence, results, approvals, names, dates, IDs, or signatures. Use clear [PLACEHOLDER] markers for missing facts. Do not reproduce copyrighted standard text. If a standard is mentioned, refer to relevant clauses only when reasonably confident.
 Use plain professional language suitable for a small or medium-sized manufacturing company. Keep the draft practical and concise enough to review. Return only the document draft, not commentary about your process.`;
 
+function localSafetyDraft(request: string, company: string, products: string, standard: string, answers: string) {
+  const subject = request.replace(/^create\s+/i, "").replace(/[.!?]+$/, "").trim() || "the requested audit document";
+  return `# ${subject}
+
+> AI DRAFT — Review, complete, and approve this document before use.
+
+## Document control
+
+| Field | Value |
+|---|---|
+| Document title | ${subject} |
+| Document number | [DOCUMENT NUMBER] |
+| Revision | [REVISION] |
+| Standard and edition | ${standard || "[STANDARD]"} |
+| Effective date | [EFFECTIVE DATE] |
+| Prepared by | [PREPARED BY] |
+| Reviewed by | [REVIEWED BY] |
+| Approved by | [APPROVED BY] |
+| Company | ${company || "[COMPANY NAME]"} |
+| Products/processes | ${products || "[PRODUCTS OR PROCESSES]"} |
+
+## 1. Purpose
+
+This document defines the company method for ${subject.toLowerCase()}. It is a starting draft and must be adapted to the actual process, responsibilities, risks, and customer requirements.
+
+## 2. Scope
+
+Applies to the relevant departments, people, suppliers, records, and activities within the audit scope. Confirm the exact locations, products, and process boundaries before approval.
+
+## 3. Responsibilities
+
+| Role | Responsibility |
+|---|---|
+| Process owner | [DEFINE RESPONSIBILITY] |
+| Quality representative | Verify requirements, records, and audit evidence |
+| Approver | Review and approve the controlled document |
+| Personnel performing the work | Follow the approved method and complete records |
+
+## 4. Procedure
+
+1. Confirm the applicable requirement, customer expectation, and acceptance criteria before work begins.
+2. Define the inputs, responsible person, required resources, and risks for the activity.
+3. Perform the activity using the approved current method and identify any deviations.
+4. Record objective evidence at the time the work is performed.
+5. Review results against the defined criteria and escalate failures or missing information.
+6. Control changes, approvals, revisions, and obsolete copies.
+7. Review effectiveness and update this document when risks, requirements, or the process change.
+
+## 5. Records and evidence
+
+- [ ] Approved current procedure or work instruction
+- [ ] Completed forms, logs, registers, or system records
+- [ ] Competence or training evidence for responsible personnel
+- [ ] Required approvals and review records
+- [ ] Exceptions, nonconformities, and corrective-action records
+- [ ] Evidence that the process was monitored and reviewed
+
+## 6. Audit Evidence Needed
+
+The auditor may ask to see the approved document, recent completed records, responsible-person evidence, acceptance criteria, approval history, handling of exceptions, and evidence that the process is implemented. Do not mark evidence as available until the company verifies it.
+
+## 7. Audit Readiness Matrix
+
+| Requirement | Company process | Required evidence | Owner | Status |
+|---|---|---|---|---|
+| Applicable requirements identified | [DEFINE] | Requirement review | [OWNER] | Not started |
+| Method approved and available | [DEFINE] | Approved revision | [OWNER] | Not started |
+| Personnel competent | [DEFINE] | Training/competence record | [OWNER] | Not started |
+| Records maintained | [DEFINE] | Completed records | [OWNER] | Not started |
+| Exceptions controlled | [DEFINE] | Finding/CAPA record | [OWNER] | Not started |
+
+## 8. Implementation Checklist
+
+- [ ] Confirm the actual process and scope.
+- [ ] Assign the process owner and approver.
+- [ ] Complete all placeholders with verified company facts.
+- [ ] Train affected personnel.
+- [ ] Use the form or record in live work.
+- [ ] Review an example record for completeness.
+- [ ] Conduct an internal check before the audit.
+
+## 9. Assumptions made in this draft
+
+- Company-specific facts, owners, dates, approvals, results, and records were not provided.
+- Placeholders must be completed and verified by the company.
+- User clarification answers, if supplied, were: ${answers || "[NO ADDITIONAL ANSWERS]"}
+
+## 10. Approval
+
+This draft must be reviewed by the process owner, quality representative, and authorized approver before use. `;
+}
+
 export async function POST(request: Request) {
   try {
     const apiKey = process.env.GEMINI_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "");
@@ -130,7 +222,8 @@ Use uploaded material as reference context only. Do not treat it as proof that r
       } else {
         console.error("DeepSeek fallback unavailable: DEEPSEEK_API_KEY is not set in this deployment");
       }
-      return NextResponse.json({ error: "The document provider is temporarily unavailable. Please try again in a moment." }, { status: 503 });
+      const localDocument = localSafetyDraft(requestText, companyName, products, standard, previousAnswers);
+      return NextResponse.json({ document: localDocument, quality: validateDocument(localDocument), provider: "local-safety-draft", warning: "AI providers were temporarily unavailable. Review and complete this structured safety draft before use." });
     }
 
     const providerData = await providerResponse.json();
