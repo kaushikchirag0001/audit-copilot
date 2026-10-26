@@ -50,7 +50,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const document = typeof body.document === "string" ? body.document.trim() : "";
-    const provider = body.provider === "deepseek" ? "deepseek" : "gemini";
+    const provider = body.provider === "groq" ? "groq" : "gemini";
 
     if (!document) {
       return NextResponse.json({ error: "A document is required." }, { status: 400 });
@@ -67,15 +67,15 @@ ${document}`;
 
     let raw = "";
 
-    if (provider === "deepseek" && process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")) {
-      const response = await fetch("https://api.deepseek.com/chat/completions", {
+    if (provider === "groq" && process.env.GROQ_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")) {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")}`,
+          Authorization: `Bearer ${process.env.GROQ_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")}`,
         },
         body: JSON.stringify({
-          model: "deepseek-chat",
+          model: "openai/gpt-oss-120b",
           temperature: 0.1,
           messages: [
             { role: "system", content: REVIEW_PROMPT },
@@ -85,7 +85,7 @@ ${document}`;
       });
 
       if (!response.ok) {
-        throw new Error(`DeepSeek review failed with status ${response.status}`);
+        throw new Error(`Groq review failed with status ${response.status}`);
       }
 
       const result = await response.json();
@@ -117,7 +117,7 @@ ${document}`;
     const review = JSON.parse(cleanJson(raw));
 
     return NextResponse.json({
-      provider: provider === "deepseek" && process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "") ? "deepseek" : "gemini",
+      provider: provider === "groq" && process.env.GROQ_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "") ? "groq" : "gemini",
       review,
     });
   } catch (error) {

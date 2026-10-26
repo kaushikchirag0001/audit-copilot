@@ -50,15 +50,15 @@ ${review || "[no review completed]"}
 USER QUESTION:
 ${message}`;
 
-    if (process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")) {
-      const response = await fetch("https://api.deepseek.com/chat/completions", {
+    if (process.env.GROQ_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")) {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")}`,
+          Authorization: `Bearer ${process.env.GROQ_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")}`,
         },
         body: JSON.stringify({
-          model: "deepseek-flash",
+          model: "openai/gpt-oss-120b",
           temperature: 0.2,
           messages: [
             { role: "system", content: CHAT_RULES },

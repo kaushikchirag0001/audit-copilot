@@ -198,15 +198,15 @@ Use uploaded material as reference context only. Do not treat it as proof that r
     if (!providerResponse || !providerResponse.ok) {
       const providerBody = providerResponse ? await providerResponse.text() : "Gemini request timed out";
       console.error("Gemini provider rejected request:", providerResponse?.status || "timeout", providerBody.slice(0, 500));
-      const deepseekKey = process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "");
-      if (deepseekKey) {
+      const groqKey = process.env.GROQ_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "");
+      if (groqKey) {
         try {
           const fallbackController = new AbortController();
           const fallbackTimer = setTimeout(() => fallbackController.abort(), 20000);
-          const fallback = await fetch("https://api.deepseek.com/chat/completions", {
+          const fallback = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${deepseekKey}` },
-            body: JSON.stringify({ model: "deepseek-chat", temperature: 0.2, messages: [{ role: "system", content: "Return only the requested audit document. Follow the user's current subject exactly. Never reuse a CNC example unless requested." }, { role: "user", content: prompt }] }),
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${groqKey}` },
+            body: JSON.stringify({ model: "openai/gpt-oss-120b", temperature: 0.2, messages: [{ role: "system", content: "Return only the requested audit document. Follow the user's current subject exactly. Never reuse a CNC example unless requested." }, { role: "user", content: prompt }] }),
             signal: fallbackController.signal,
           });
           clearTimeout(fallbackTimer);
@@ -215,12 +215,12 @@ Use uploaded material as reference context only. Do not treat it as proof that r
             const fallbackDocument = fallbackData.choices?.[0]?.message?.content?.trim();
             if (fallbackDocument) return NextResponse.json({ document: fallbackDocument, quality: validateDocument(fallbackDocument), provider: "fallback" });
           }
-          console.error("DeepSeek fallback rejected request:", fallback.status, (await fallback.text()).slice(0, 300));
+          console.error("Groq fallback rejected request:", fallback.status, (await fallback.text()).slice(0, 300));
         } catch (fallbackError) {
-          console.error("DeepSeek fallback failed:", fallbackError instanceof Error ? fallbackError.message : "unknown error");
+          console.error("Groq fallback failed:", fallbackError instanceof Error ? fallbackError.message : "unknown error");
         }
       } else {
-        console.error("DeepSeek fallback unavailable: DEEPSEEK_API_KEY is not set in this deployment");
+        console.error("Groq fallback unavailable: GROQ_API_KEY is not set in this deployment");
       }
       const localDocument = localSafetyDraft(requestText, companyName, products, standard, previousAnswers);
       return NextResponse.json({ document: localDocument, quality: validateDocument(localDocument), provider: "local-safety-draft", warning: "AI providers were temporarily unavailable. Review and complete this structured safety draft before use." });

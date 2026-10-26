@@ -62,16 +62,16 @@ export async function POST(request: Request) {
     if (!documentRequest) return NextResponse.json({ error: "Please describe the document you need." }, { status: 400 });
     if (/just\s+draft|draft\s+it|skip\s+questions/i.test(documentRequest)) return NextResponse.json({ ready: true, questions: [] });
 
-    const deepseekKey = process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "");
-    if (deepseekKey) {
+    const groqKey = process.env.GROQ_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "");
+    if (groqKey) {
       const prompt = `You are the clarification assistant for Audit Copilot. Ask only the smallest number of questions needed to create a useful manufacturing audit document. Never assume CNC, calibration, suppliers, or any other subject unless the current request says so. Return only valid JSON with {"ready":boolean,"questions":[{"id":string,"question":string,"reason":string,"options":string[],"allowCustom":boolean}]}. Ask at most 5 questions. Use plain English for beginners. A question may be omitted when a [PLACEHOLDER] is safe. Never ask for passwords, API keys, secrets, or signatures. Current request: ${documentRequest}\nCompany: ${companyName || "not provided"}\nProducts/processes: ${products || "not provided"}\nRole: ${role}\nStandard: ${standard}\nPrevious answers: ${previousAnswers || "none"}\nUploaded reference summary: ${uploadedContext || "none"}`;
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 15000);
       try {
-        const response = await fetch("https://api.deepseek.com/chat/completions", {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${deepseekKey}` },
-          body: JSON.stringify({ model: "deepseek-chat", temperature: 0.1, response_format: { type: "json_object" }, messages: [{ role: "system", content: "Return JSON only." }, { role: "user", content: prompt }] }),
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${groqKey}` },
+          body: JSON.stringify({ model: "openai/gpt-oss-120b", temperature: 0.1, response_format: { type: "json_object" }, messages: [{ role: "system", content: "Return JSON only." }, { role: "user", content: prompt }] }),
           signal: controller.signal,
         });
         if (response.ok) {

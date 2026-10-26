@@ -20,8 +20,8 @@ export async function POST(request: Request) {
     if (topic.length > 3000 || answer.length > 12000) return NextResponse.json({ error: "The mock-audit response is too long." }, { status: 400 });
     const prompt = `${RULES}\n\nAUDIT TOPIC:\n${topic}\n\nCOMPANY CONTEXT:\n${context || "[not provided]"}\n\nPREVIOUS SESSION:\n${history || "No answer yet. Ask the first practical auditor question."}\n\nCURRENT USER ANSWER:\n${answer || "[no answer yet]"}`;
     let raw = "";
-    if (process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")) {
-      const response = await fetch("https://api.deepseek.com/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")}` }, body: JSON.stringify({ model: "deepseek-chat", temperature: 0.1, messages: [{ role: "system", content: RULES }, { role: "user", content: prompt }] }) });
+    if (process.env.GROQ_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")) {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.GROQ_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "")}` }, body: JSON.stringify({ model: "openai/gpt-oss-120b", temperature: 0.1, messages: [{ role: "system", content: RULES }, { role: "user", content: prompt }] }) });
       if (response.ok) { const result = await response.json(); raw = result.choices?.[0]?.message?.content || ""; }
     }
     if (!raw) {
