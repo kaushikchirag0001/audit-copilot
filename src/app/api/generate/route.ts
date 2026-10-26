@@ -109,19 +109,26 @@ Use uploaded material as reference context only. Do not treat it as proof that r
       const deepseekKey = process.env.DEEPSEEK_API_KEY?.trim().replace(/[^\x00-\xFF]/g, "");
       if (deepseekKey) {
         try {
+          const fallbackController = new AbortController();
+          const fallbackTimer = setTimeout(() => fallbackController.abort(), 20000);
           const fallback = await fetch("https://api.deepseek.com/chat/completions", {
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${deepseekKey}` },
             body: JSON.stringify({ model: "deepseek-chat", temperature: 0.2, messages: [{ role: "system", content: "Return only the requested audit document. Follow the user's current subject exactly. Never reuse a CNC example unless requested." }, { role: "user", content: prompt }] }),
+            signal: fallbackController.signal,
           });
+          clearTimeout(fallbackTimer);
           if (fallback.ok) {
             const fallbackData = await fallback.json();
             const fallbackDocument = fallbackData.choices?.[0]?.message?.content?.trim();
             if (fallbackDocument) return NextResponse.json({ document: fallbackDocument, quality: validateDocument(fallbackDocument), provider: "fallback" });
           }
+          console.error("DeepSeek fallback rejected request:", fallback.status, (await fallback.text()).slice(0, 300));
         } catch (fallbackError) {
-          console.error("Fallback generation failed:", fallbackError instanceof Error ? fallbackError.message : "unknown error");
+          console.error("DeepSeek fallback failed:", fallbackError instanceof Error ? fallbackError.message : "unknown error");
         }
+      } else {
+        console.error("DeepSeek fallback unavailable: DEEPSEEK_API_KEY is not set in this deployment");
       }
       return NextResponse.json({ error: "The document provider is temporarily unavailable. Please try again in a moment." }, { status: 503 });
     }
